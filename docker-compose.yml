@@ -1,0 +1,39 @@
+version: '3.1'
+
+services:
+  nginx:
+    image: nginx
+    container_name: book_nginx
+    volumes:
+      - ./logs:/var/log/nginx
+      - ./bookmedik:/bookmedik
+      - ./default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - 80:80
+    restart: always
+    environment:
+      - DATABASE_SERVER=book_sql
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=book_user
+      - MYSQL_PASSWORD=book_passwd
+      - MYSQL_DATABASE=bookmedik
+
+  php-fpm:
+    image: juanan219/php_mysqli
+    container_name: book_php
+    volumes:
+      - ./bookmedik:/bookmedik
+    restart: always
+
+  mysql:
+    image: mariadb
+    container_name: book_sql
+    volumes:
+      - ./mysql:/var/lib/mysql
+      - ./bookmedik/schema.sql:/opt/schema.sql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=book_user
+      - MYSQL_PASSWORD=book_passwd
+      - MYSQL_DATABASE=bookmedik
+    restart: always
